@@ -11,4 +11,4 @@ const container = document.getElementById("root");
 const root = ReactDOMClient.createRoot(container);
 
 // Initial render: Render an element to the Root
-root.render(<MyApp />);
+root.render(<MyApp />);ssrExportNameKey

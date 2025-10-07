@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, {useState, useEffect} from 'react';
 import Table from "./Table";
 import Form from "./Form";
 
 
 
 function MyApp() {
+
+  function fetchUsers() {
+    const promise = fetch("http://localhost:8000/users");
+    return promise;
+  }
+
   const [characters, setCharacters] = useState([
     { name: "Charlie", job: "Janitor" },
     { name: "Mac", job: "Bouncer" },
