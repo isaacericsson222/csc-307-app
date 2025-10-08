@@ -72,8 +72,26 @@ const deleteUserById = (id) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  let id = "";
+  for (let i = 0; i < 3; i++) {
+    id += letters.charAt(Math.floor(Math.random() * letters.length));
+  }
+  for (let i = 0; i < 3; i++) {
+    id += Math.floor(Math.random() * 10);
+  }
+  userToAdd.id = id;
+
+  //new user had id last, doesn't look as nice :)
+  const newUser = {
+    id: id,
+    name: userToAdd.name,
+    job: userToAdd.job,
+  };
+  //this resets the order
+
+  addUser(newUser);
+  res.status(201).send(newUser);
 });
 
 app.get("/", (req, res) => {
@@ -98,7 +116,7 @@ app.get("/users", (req, res) => {
 });
 
 app.get("/users/:id", (req, res) => {
-  const id = req.params["id"]; //or req.params.id
+  const id = req.params["id"]; 
   let result = findUserById(id);
   if (result === undefined) {
     res.status(404).send("Resource not found.");
@@ -112,7 +130,7 @@ app.delete("/users/:id", (req, res) => {
   const success = deleteUserById(id);
 
   if (success) {
-    res.status(204).send(); // No content
+    res.status(204).send(); 
   } else {
     res.status(404).send("Resource not found.");
   }
