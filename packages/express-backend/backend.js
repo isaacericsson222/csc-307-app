@@ -1,6 +1,83 @@
 // backend.js
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
+import userService from "./user-services.js";
+
+const app = express();
+const PORT = 8000;
+
+app.use(cors());
+app.use(express.json());
+
+// Base route
+app.get("/", (_req, res) => res.send("API OK — try GET /users"));
+
+// ---- USERS ROUTES ----
+
+// GET /users?name=&job=
+app.get("/users", async (req, res) => {
+  try {
+    const { name, job } = req.query;
+    const users = await userService.getUsers(name, job);
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
+// GET /users/:id
+app.get("/users/:id", async (req, res) => {
+  try {
+    const user = await userService.findUserById(req.params.id);
+    if (!user) return res.status(404).json({ error: "Not found" });
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: "Invalid ID" });
+  }
+});
+
+// POST /users
+app.post("/users", async (req, res) => {
+  try {
+    const created = await userService.addUser(req.body);
+    res.status(201).json(created);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message || "Validation error" });
+  }
+});
+
+// DELETE /users/:id
+app.delete("/users/:id", async (req, res) => {
+  try {
+    const deleted = await userService.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Not found" });
+    res.status(204).send();
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: "Invalid ID" });
+  }
+});
+
+// ---- CONNECT TO DB ----
+
+mongoose.connection.once("open", () => {
+  console.log("✅ Mongo connected");
+  app.listen(PORT, () =>
+    console.log(`✅ API listening on http://localhost:${PORT}`)
+  );
+});
+
+mongoose.connection.on("error", (err) => {
+  console.error("Mongo connection error:", err);
+});
+
+/*
+import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
@@ -141,3 +218,4 @@ app.listen(port, () => {
     `Example app listening at http://localhost:${port}`
   );
 });
+*/
